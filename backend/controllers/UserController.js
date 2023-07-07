@@ -1,12 +1,16 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+/* helpers */
+const createUserToken = require('../helpers/create-user-token');
+const checkUserExists = require('../helpers/check-if-user-exists');
+
 module.exports = class UserController {
 
     static async register(req, res) {
         const { name, email, phone, age, password, confirmpassword  } = req.body;
 
-        const userExists = await User.findOne({email: email});
+        const userExists = await checkUserExists(email);
 
         if(!name) {
             return res.status(422).json({ message: 'O nome é obrigatório' });
@@ -59,13 +63,45 @@ module.exports = class UserController {
         try {
 
             const newUser = await user.save();
-            return res.status(201).json({ 
-                message: 'Usuário registrado com sucesso' 
-            })
+            await createUserToken(newUser, req, res);
 
         } catch (error) {
             console.log(error)
-            return res.status(422).json({ 
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async login(req, res) {
+
+        const { email, password } = req.body;
+
+        const user = await checkUserExists(email);
+
+        if (!user) {
+            return res.status(422).json({ message: 'Este usuário não existe.' });
+        }
+
+        if (!email) {
+            return res.status(422).json({ message: 'O email é obrigatório' });
+        }
+
+        if (!password) {
+            return res.status(422).json({ message: 'A senha é obrigatória' });
+        }
+
+        const checkPassword = await bcrypt.compare(password, user.password);
+        if (!checkPassword) {
+            return res.status(422).json({ message: 'Senha inválida, tente novamente' });
+        }
+
+        try {
+            await createUserToken(user, req, res);
+
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({ 
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.' 
             });
         }
