@@ -91,6 +91,7 @@ module.exports = class UserController {
             return res.status(422).json({ message: 'A senha é obrigatória' });
         }
 
+        /* checking password */
         const checkPassword = await bcrypt.compare(password, user.password);
         if (!checkPassword) {
             return res.status(422).json({ message: 'Senha inválida, tente novamente' });
