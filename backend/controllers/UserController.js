@@ -1,9 +1,11 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 /* helpers */
 const createUserToken = require('../helpers/create-user-token');
 const checkUserExists = require('../helpers/check-if-user-exists');
+const getToken = require('../helpers/get_token');
 
 module.exports = class UserController {
 
@@ -64,6 +66,7 @@ module.exports = class UserController {
 
             const newUser = await user.save();
             await createUserToken(newUser, req, res);
+            res.status(201).json({ message: 'Registrado com sucesso!' });
 
         } catch (error) {
             console.log(error)
@@ -98,7 +101,9 @@ module.exports = class UserController {
         }
 
         try {
+
             await createUserToken(user, req, res);
+            res.status(201).json({ message: 'Logado com sucesso!' });
 
         } catch (error) {
             console.log(error)
@@ -106,6 +111,54 @@ module.exports = class UserController {
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.' 
             });
         }
+    }
+
+    static async checkUser(req, res) {
+
+        let currentUser;
+
+        if (!req.headers.authorization) return res.status(401).json({
+            message: 'O token é necessário.'
+        })
+
+        const token = await getToken(req);
+        const decoded = jwt.verify(token, `${process.env.SECRET_JWT}`);
+
+        try {
+
+            currentUser = await User.findById(decoded.id).select('-password');
+
+            res.status(201).json({ currentUser });
+
+        } catch (error) {
+
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async getUserById(req, res) {
+
+        const id = req.params.id;
+
+        try {
+
+            const user = await User.findById({ _id: id }).select('-password');
+            if (!user) throw new Error();
+
+            res.status(200).json({ user });
+
+        } catch (error) {
+
+            console.log(error);
+            return res.status(500).json({
+                message: 'Usuário não encontrado.'
+            });
+
+        }
+
     }
 
 }
