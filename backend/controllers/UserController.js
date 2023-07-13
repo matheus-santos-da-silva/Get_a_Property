@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const createUserToken = require('../helpers/create-user-token');
 const checkUserExists = require('../helpers/check-if-user-exists');
 const getToken = require('../helpers/get_token');
+const getUserByToken = require('../helpers/get-user-by-token');
+const encryptingPass = require('../helpers/encrypt-password');
 
 module.exports = class UserController {
 
@@ -34,10 +36,6 @@ module.exports = class UserController {
             return res.status(422).json({ message: 'A idade é obrigatória' });
         }
 
-        if(password.length < 8) {
-            return res.status(422).json({ message: 'A senha precisa ter pelo menos 8 caracteres' });
-        }
-
         if(!password) {
             return res.status(422).json({ message: 'A senha é obrigatória' });
         }
@@ -51,8 +49,7 @@ module.exports = class UserController {
         }
 
         /* Encrypting password */
-        const salt = await bcrypt.genSalt(12);
-        const passwordHash = await bcrypt.hash(password.toString(), salt);
+        const passwordHash = await encryptingPass(password);
 
         const user = new User({
             name: name,
@@ -155,6 +152,86 @@ module.exports = class UserController {
             console.log(error);
             return res.status(500).json({
                 message: 'Usuário não encontrado.'
+            });
+
+        }
+
+    }
+
+    static async editUser(req, res) {
+
+        const id = req.params.id;
+        const { name, email, phone, age, password, confirmpassword } = req.body;
+
+        const token = await getToken(req);
+        const user = await getUserByToken(token);
+
+        const idExists = await User.findById(id);
+        if (!idExists) {
+            return res.status(422).json({ message: 'Usuário não encontrado.' });
+        }
+
+        if (!user) {
+            return res.status(422).json({ message: 'Usuário não encontrado.' });
+        }
+
+
+        if (!name) {
+            return res.status(422).json({ message: 'O nome é obrigatório' });
+        }
+
+        user.name = name;
+
+        const userExists = await User.findOne({ email: email });
+
+        if (user.email === email && userExists) {
+            return res.status(422).json({ message: 'Utilize outro email!' });
+        }
+
+        if (!email) {
+            return res.status(422).json({ message: 'O email é obrigatório' });
+        }
+
+        user.email = email;
+
+        if (!phone) {
+            return res.status(422).json({ message: 'O telefone é obrigatório' });
+        }
+
+        user.phone = phone;
+
+        if (!age) {
+            return res.status(422).json({ message: 'A idade é obrigatória' });
+        }
+
+        user.age = age;
+
+        if (!password) {
+            return res.status(422).json({ message: 'A senha é obrigatória' });
+        }
+
+        const passwordHash = await encryptingPass(password);
+        user.password = passwordHash;
+
+        if (!confirmpassword) {
+            return res.status(422).json({ message: 'A confirmação de senha é obrigatória' });
+        }
+
+        if (confirmpassword !== password) {
+            return res.status(422).json({ message: 'As senhas não condizem' });
+        }
+
+
+        try {
+
+            await User.findByIdAndUpdate({ _id: user.id }, user);
+            return res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
+
+        } catch (error) {
+
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
 
         }
