@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv').config();
 
+/* Routes */
 const UserRoutes = require('./routes/UserRoutes');
+const PropertyRoutes = require('./routes/PropertyRoutes');
 
 const app = express();
 
@@ -16,5 +18,6 @@ app.use(express.static('public'));
 
 /* Routes */
 app.use('/users', UserRoutes);
+app.use('/propertys', PropertyRoutes);
 
 app.listen(process.env.PORT);
