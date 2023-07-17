@@ -78,4 +78,23 @@ module.exports = class PropertyController {
 
     }
 
+    static async getAll(req, res) {
+
+        const propertys = await Property.find().sort('-createdAt');
+        res.status(200).json({ propertys: propertys });
+
+    }
+
+    static async getUserPropertys(req, res) {
+
+        const token = await getToken(req);
+        const user = await getUserByToken(token);
+
+        const propertys = await Property.find({ 'user._id': user._id }).sort('-createdAt');
+        res.status(200).json({ propertys: propertys });
+
+    }
+
+
+
 }
