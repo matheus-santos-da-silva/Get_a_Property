@@ -13,5 +13,7 @@ router.post(
     imageUpload.array('images'),
     PropertyController.create
 );
+router.get('/', PropertyController.getAll);
+router.get('/mypropertys', verifyToken, PropertyController.getUserPropertys);
 
 module.exports = router;
