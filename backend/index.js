@@ -18,6 +18,6 @@ app.use(express.static('public'));
 
 /* Routes */
 app.use('/users', UserRoutes);
-app.use('/propertys', PropertyRoutes);
+app.use('/properties', PropertyRoutes);
 
 app.listen(process.env.PORT);
