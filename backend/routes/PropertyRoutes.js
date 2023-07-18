@@ -14,6 +14,9 @@ router.post(
     PropertyController.create
 );
 router.get('/', PropertyController.getAll);
-router.get('/mypropertys', verifyToken, PropertyController.getUserPropertys);
+router.get('/myproperties', verifyToken, PropertyController.getUserProperties);
+router.get('/mynegotiations', verifyToken, PropertyController.getUserNegotiations);
+router.get('/:id', PropertyController.getPropertyById);
+router.delete('/:id', verifyToken, PropertyController.deleteProperty);
 
 module.exports = router;
