@@ -80,21 +80,107 @@ module.exports = class PropertyController {
 
     static async getAll(req, res) {
 
-        const propertys = await Property.find().sort('-createdAt');
-        res.status(200).json({ propertys: propertys });
+        try {
+            const properties = await Property.find().sort('-createdAt');
+            return res.status(200).json({ properties: properties });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
+
+
 
     }
 
-    static async getUserPropertys(req, res) {
+    static async getUserProperties(req, res) {
 
         const token = await getToken(req);
         const user = await getUserByToken(token);
 
-        const propertys = await Property.find({ 'user._id': user._id }).sort('-createdAt');
-        res.status(200).json({ propertys: propertys });
+        try {
+
+            const properties = await Property.find({ 'user._id': user._id }).sort('-createdAt');
+            return res.status(200).json({ properties: properties });
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
 
     }
 
+    static async getUserNegotiations(req, res) {
 
+        const token = await getToken(req);
+        const user = await getUserByToken(token);
+
+        try {
+
+            const properties = await Property.find({ 'contractor._id': user._id }).sort('-createdAt');
+            return res.status(200).json({ properties: properties });
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async getPropertyById(req, res) {
+
+        const id = req.params.id;
+
+        const idExists = await Property.findById(id);
+        if (!idExists) {
+            return res.status(422).json({ message: 'Imóvel não encontrado.' });
+        }
+
+        try {
+
+            const property = await Property.findById(id);
+            return res.status(200).json({ property: property });
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async deleteProperty(req, res) {
+
+        const id = req.params.id;
+
+        const token = await getToken(req);
+        const user = await getUserByToken(token);
+
+        const idExists = await Property.findById(id);
+        if (!idExists) {
+            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+        }
+
+        if (idExists.user._id.toString() !== user._id.toString()) {
+            return res.status(422).json({ message: 'Este imóvel não é seu!' });
+        }
+
+        try {
+
+            await Property.findByIdAndRemove(id);
+            return res.status(200).json({ message: 'Imóvel removido com sucesso!' });
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
+
+    }
 
 }
