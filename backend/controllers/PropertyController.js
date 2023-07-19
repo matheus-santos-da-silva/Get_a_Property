@@ -180,6 +180,79 @@ module.exports = class PropertyController {
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
         }
+    }
+
+    static async editProperty(req, res) {
+
+        const id = req.params.id;
+        const { type, address, zipcode, price, bedrooms, description, available } = req.body;
+        const images = req.files;
+
+        const updatedData = {};
+
+        const token = await getToken(req);
+        const user = await getUserByToken(token);
+
+        const idExists = await Property.findOne({ _id: id });
+        if (!idExists) {
+            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+        }
+
+        if (idExists.user._id.toString() !== user._id.toString()) {
+            return res.status(422).json({ message: 'Este imóvel não é seu!' });
+        }
+
+        if (!type) {
+            return res.status(422).json({ message: 'O tipo do imóvel é obrigatório' });
+        }
+
+        updatedData.type = type;
+
+        if (!address) {
+            return res.status(422).json({ message: 'O endereço do imóvel é obrigatório' });
+        }
+
+        updatedData.address = address;
+
+        if (!zipcode) {
+            return res.status(422).json({ message: 'O cep é obrigatório' });
+        }
+
+        updatedData.zipcode = zipcode;
+
+        if (!price) {
+            return res.status(422).json({ message: 'O preço é obrigatório' });
+        }
+
+        updatedData.price = price;
+
+        if (!bedrooms) {
+            return res.status(422).json({ message: 'A quantidade de quartos do seu imóvel é obrigatória' });
+        }
+
+        updatedData.bedrooms = bedrooms;
+
+        if (images.length === 0) {
+            return res.status(422).json({ message: 'A imagem é obrigatória.' });
+        } else {
+            updatedData.images = [];
+            images.map((image) => {
+                updatedData.images.push(image.filename);
+            })
+        }
+
+        try {
+
+            await Property.findByIdAndUpdate(id, updatedData);
+            return res.status(200).json({ message: 'Imóvel atualizado com sucesso!' });
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+
+        }
 
     }
 
