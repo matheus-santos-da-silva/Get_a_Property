@@ -168,7 +168,7 @@ module.exports = class UserController {
 
         const idExists = await User.findById(id);
         if (!idExists) {
-            return res.status(422).json({ message: 'Usuário não encontrado.' });
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
 
         if (!user) {
