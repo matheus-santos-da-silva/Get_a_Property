@@ -16,32 +16,27 @@ module.exports = class UserController {
 
         const userExists = await checkUserExists(email);
 
-        if(!name) {
-            return res.status(422).json({ message: 'O nome é obrigatório' });
-        }
+        const validations = [
+            { field: 'name', message: 'O nome é obrigatório' },
+            { field: 'email', message: 'O email é obrigatório' },
+            { field: 'phone', message: 'O telefone é obrigatório' },
+            {
+                field: 'age', message: 'A idade é obrigatória e deve ser maior que 18 anos',
+                check: () => parseInt(age, 10) >= 18
+            },
+            { field: 'password', message: 'A senha é obrigatória' },
+            { field: 'confirmpassword', message: 'A confirmação de senha é obrigatória' },
+        ];
 
-        if(!email) {
-            return res.status(422).json({ message: 'O email é obrigatório' });
+        for (const validation of validations) {
+            if (!req.body[validation.field] || (validation.check && !validation.check())) {
+                res.status(422).json({ message: validation.message });
+                return;
+            }
         }
 
         if(userExists) {
             return res.status(422).json({ message: 'Já existe um usuário com este email' });
-        }
-
-        if(!phone) {
-            return res.status(422).json({ message: 'O telefone é obrigatório' });
-        }
-
-        if(!age) {
-            return res.status(422).json({ message: 'A idade é obrigatória' });
-        }
-
-        if(!password) {
-            return res.status(422).json({ message: 'A senha é obrigatória' });
-        }
-
-        if(!confirmpassword) {
-            return res.status(422).json({ message: 'A confirmação de senha é obrigatória' });
         }
 
         if(confirmpassword !== password) {
@@ -172,15 +167,20 @@ module.exports = class UserController {
         }
 
         if (!user) {
-            return res.status(422).json({ message: 'Usuário não encontrado.' });
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
 
-
-        if (!name) {
-            return res.status(422).json({ message: 'O nome é obrigatório' });
-        }
-
-        user.name = name;
+        const validations = [
+            { field: 'name', message: 'O nome é obrigatório' },
+            { field: 'email', message: 'O email é obrigatório' },
+            { field: 'phone', message: 'O telefone é obrigatório' },
+            {
+                field: 'age', message: 'A idade é obrigatória e deve ser maior que 18 anos',
+                check: () => parseInt(age, 10) >= 18
+            },
+            { field: 'password', message: 'A senha é obrigatória' },
+            { field: 'confirmpassword', message: 'A confirmação de senha é obrigatória' },
+        ];
 
         const userExists = await User.findOne({ email: email });
 
@@ -188,39 +188,25 @@ module.exports = class UserController {
             return res.status(422).json({ message: 'Utilize outro email!' });
         }
 
-        if (!email) {
-            return res.status(422).json({ message: 'O email é obrigatório' });
-        }
-
         user.email = email;
 
-        if (!phone) {
-            return res.status(422).json({ message: 'O telefone é obrigatório' });
+        for (const validation of validations) {
+            if (!req.body[validation.field] || (validation.check && !validation.check())) {
+                res.status(422).json({ message: validation.message });
+                return;
+            }
         }
 
+        user.name = name;
         user.phone = phone;
-
-        if (!age) {
-            return res.status(422).json({ message: 'A idade é obrigatória' });
-        }
-
         user.age = age;
-
-        if (!password) {
-            return res.status(422).json({ message: 'A senha é obrigatória' });
-        }
 
         const passwordHash = await encryptingPass(password);
         user.password = passwordHash;
 
-        if (!confirmpassword) {
-            return res.status(422).json({ message: 'A confirmação de senha é obrigatória' });
-        }
-
         if (confirmpassword !== password) {
             return res.status(422).json({ message: 'As senhas não condizem' });
         }
-
 
         try {
 
@@ -233,9 +219,6 @@ module.exports = class UserController {
             return res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
-
         }
-
     }
-
 }
