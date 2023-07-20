@@ -11,26 +11,20 @@ module.exports = class PropertyController {
         const { type, address, zipcode, price, bedrooms, description } = req.body;
         const images = req.files;
 
+        const validations = [
+            { field: 'type', message: 'O tipo do imóvel é obrigatório' },
+            { field: 'address', message: 'O endereço do imóvel é obrigatório' },
+            { field: 'zipcode', message: 'O cep é obrigatório' },
+            { field: 'price', message: 'O preço é obrigatório' },
+            { field: 'bedrooms', message: 'A quantidade de quartos do seu imóvel é obrigatória' },
+        ];
+
         const available = true;
 
-        if (!type) {
-            return res.status(422).json({ message: 'O tipo do imóvel é obrigatório' });
-        }
-
-        if (!address) {
-            return res.status(422).json({ message: 'O endereço do imóvel é obrigatório' });
-        }
-
-        if (!zipcode) {
-            return res.status(422).json({ message: 'O cep é obrigatório' });
-        }
-
-        if (!price) {
-            return res.status(422).json({ message: 'O preço é obrigatório' });
-        }
-
-        if (!bedrooms) {
-            return res.status(422).json({ message: 'A quantidade de quartos do seu imóvel é obrigatória' });
+        for (const validation of validations) {
+            if (!req.body[validation.field]) {
+                return res.status(422).json({ message: validation.message });
+            }
         }
 
         if (images.length === 0) {
@@ -75,7 +69,6 @@ module.exports = class PropertyController {
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
         }
-
     }
 
     static async getAll(req, res) {
@@ -89,8 +82,6 @@ module.exports = class PropertyController {
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
         }
-
-
 
     }
 
@@ -185,8 +176,18 @@ module.exports = class PropertyController {
     static async editProperty(req, res) {
 
         const id = req.params.id;
-        const { type, address, zipcode, price, bedrooms, description, available } = req.body;
+        const { type, address, zipcode, price, bedrooms, description } = req.body;
         const images = req.files;
+
+        const available = true;
+
+        const validations = [
+            { field: 'type', message: 'O tipo do imóvel é obrigatório' },
+            { field: 'address', message: 'O endereço do imóvel é obrigatório' },
+            { field: 'zipcode', message: 'O cep é obrigatório' },
+            { field: 'price', message: 'O preço é obrigatório' },
+            { field: 'bedrooms', message: 'A quantidade de quartos do seu imóvel é obrigatória' },
+        ];
 
         const updatedData = {};
 
@@ -202,34 +203,16 @@ module.exports = class PropertyController {
             return res.status(422).json({ message: 'Este imóvel não é seu!' });
         }
 
-        if (!type) {
-            return res.status(422).json({ message: 'O tipo do imóvel é obrigatório' });
+        for (const validation of validations) {
+            if (!req.body[validation.field]) {
+                return res.status(422).json({ message: validation.message });
+            }
         }
 
         updatedData.type = type;
-
-        if (!address) {
-            return res.status(422).json({ message: 'O endereço do imóvel é obrigatório' });
-        }
-
         updatedData.address = address;
-
-        if (!zipcode) {
-            return res.status(422).json({ message: 'O cep é obrigatório' });
-        }
-
         updatedData.zipcode = zipcode;
-
-        if (!price) {
-            return res.status(422).json({ message: 'O preço é obrigatório' });
-        }
-
         updatedData.price = price;
-
-        if (!bedrooms) {
-            return res.status(422).json({ message: 'A quantidade de quartos do seu imóvel é obrigatória' });
-        }
-
         updatedData.bedrooms = bedrooms;
 
         if (images.length === 0) {
