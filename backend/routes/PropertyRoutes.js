@@ -20,5 +20,7 @@ router.get('/mynegotiations', verifyToken, PropertyController.getUserNegotiation
 router.get('/:id', PropertyController.getPropertyById);
 router.delete('/:id', verifyToken, PropertyController.deleteProperty);
 router.patch('/edit/:id', verifyToken, imageUpload.array('images'), PropertyController.editProperty);
+router.patch('/schedule/:id', verifyToken, PropertyController.schedule);
+router.patch('/conclude/:id', verifyToken, PropertyController.concludeNegotiation);
 
 module.exports = router;
