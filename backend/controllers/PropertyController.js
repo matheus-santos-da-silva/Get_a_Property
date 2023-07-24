@@ -234,6 +234,79 @@ module.exports = class PropertyController {
             return res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+        }
+    }
+
+    static async schedule(req, res) {
+
+        const id = req.params.id;
+
+        const property = await Property.findOne({ _id: id });
+        if (!property) {
+            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+        }
+
+        const token = await getToken(req);
+        const user = await getUserByToken(token);
+
+        if (property.user._id.toString() === user._id.toString()) {
+            return res.status(404).json({ message: 'Você não pode agendar uma visita para o seu próprio imóvel.' });
+        }
+
+        if (property.contractor._id.toString() === user._id.toString()) {
+            return res.status(404).json({ message: 'Você já agendou uma visita a esse imóvel.' });
+        }
+
+
+        try {
+
+            property.contractor = {
+                _id: user._id,
+                name: user.name,
+                phone: user.phone
+            }
+
+            await Property.findByIdAndUpdate(id, property);
+            return res.status(200).json({ message: `Visita agendada com sucesso entre em contato com o ${property.user.name}, pelo telefone ${property.user.phone}` });
+
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async concludeNegotiation(req, res) {
+
+        const id = req.params.id;
+
+        const property = await Property.findOne({ _id: id });
+        if (!property) {
+            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+        }
+
+        const token = await getToken(req);
+        const user = await getUserByToken(token);
+
+        if (property.user._id.toString() !== user._id.toString()) {
+            return res.status(422).json({ message: 'Este imóvel não é seu!' });
+        }
+
+        property.available = false;
+
+        try {
+
+            await Property.findByIdAndUpdate(id, property);
+            return res.status(200).json({ message: 'Parabéns! o processo de negociação foi finalizado com sucesso!' });
+
+        } catch (error) {
+
+            console.log(error);
+            return res.status(500).json({
+                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            });
 
         }
 
