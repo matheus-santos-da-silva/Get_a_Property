@@ -8,6 +8,7 @@ function Input({ type, text, name, placeholder, handleOnChange, value, multiple 
             <input
                 type={type}
                 id={name}
+                name={name}
                 placeholder={placeholder}
                 onChange={handleOnChange}
                 value={value}
