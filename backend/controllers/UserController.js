@@ -36,11 +36,13 @@ module.exports = class UserController {
         }
 
         if(userExists) {
-            return res.status(422).json({ message: 'Já existe um usuário com este email' });
+            res.status(422).json({ message: 'Já existe um usuário com este email' });
+            return;
         }
 
         if(confirmpassword !== password) {
-            return res.status(422).json({ message: 'As senhas não condizem' });
+            res.status(422).json({ message: 'As senhas não condizem' });
+            return;
         }
 
         /* Encrypting password */
@@ -58,13 +60,13 @@ module.exports = class UserController {
 
             const newUser = await user.save();
             await createUserToken(newUser, req, res);
-            res.status(201).json({ message: 'Registrado com sucesso!' });
 
         } catch (error) {
             console.log(error)
-            return res.status(500).json({
-                message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
+            res.status(500).json({
+                message: error
             });
+            return;
         }
     }
 
@@ -75,33 +77,37 @@ module.exports = class UserController {
         const user = await checkUserExists(email);
 
         if (!user) {
-            return res.status(422).json({ message: 'Este usuário não existe.' });
+            res.status(422).json({ message: 'Este usuário não existe.' });
+            return;
         }
 
         if (!email) {
-            return res.status(422).json({ message: 'O email é obrigatório' });
+            res.status(422).json({ message: 'O email é obrigatório' });
+            return;
         }
 
         if (!password) {
-            return res.status(422).json({ message: 'A senha é obrigatória' });
+            res.status(422).json({ message: 'A senha é obrigatória' });
+            return;
         }
 
         /* checking password */
         const checkPassword = await bcrypt.compare(password, user.password);
         if (!checkPassword) {
-            return res.status(422).json({ message: 'Senha inválida, tente novamente' });
+            res.status(422).json({ message: 'Senha inválida, tente novamente' });
+            return;
         }
 
         try {
 
             await createUserToken(user, req, res);
-            res.status(201).json({ message: 'Logado com sucesso!' });
 
         } catch (error) {
             console.log(error)
-            return res.status(500).json({ 
+            res.status(500).json({ 
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.' 
             });
+            return;
         }
     }
 
@@ -121,13 +127,15 @@ module.exports = class UserController {
             currentUser = await User.findById(decoded.id).select('-password');
 
             res.status(201).json({ currentUser });
+            return;
 
         } catch (error) {
 
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return;
         }
     }
 
@@ -141,13 +149,15 @@ module.exports = class UserController {
             if (!user) throw new Error();
 
             res.status(200).json({ user });
+            return;
 
         } catch (error) {
 
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Usuário não encontrado.'
             });
+            return;
 
         }
 
@@ -163,11 +173,13 @@ module.exports = class UserController {
 
         const idExists = await User.findById(id);
         if (!idExists) {
-            return res.status(404).json({ message: 'Usuário não encontrado.' });
+            res.status(404).json({ message: 'Usuário não encontrado.' });
+            return;
         }
 
         if (!user) {
-            return res.status(404).json({ message: 'Usuário não encontrado.' });
+            res.status(404).json({ message: 'Usuário não encontrado.' });
+            return;
         }
 
         const validations = [
@@ -185,7 +197,8 @@ module.exports = class UserController {
         const userExists = await User.findOne({ email: email });
 
         if (user.email === email && userExists) {
-            return res.status(422).json({ message: 'Utilize outro email!' });
+            res.status(422).json({ message: 'Utilize outro email!' });
+            return;
         }
 
         user.email = email;
@@ -205,20 +218,23 @@ module.exports = class UserController {
         user.password = passwordHash;
 
         if (confirmpassword !== password) {
-            return res.status(422).json({ message: 'As senhas não condizem' });
+            res.status(422).json({ message: 'As senhas não condizem' });
+            return;
         }
 
         try {
 
             await User.findByIdAndUpdate({ _id: user.id }, user);
-            return res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
+            res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
+            return;
 
         } catch (error) {
 
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return;
         }
     }
 }

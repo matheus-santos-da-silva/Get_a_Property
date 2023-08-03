@@ -23,12 +23,14 @@ module.exports = class PropertyController {
 
         for (const validation of validations) {
             if (!req.body[validation.field]) {
-                return res.status(422).json({ message: validation.message });
+                res.status(422).json({ message: validation.message });
+                return; 
             }
         }
 
         if (images.length === 0) {
-            return res.status(422).json({ message: 'A imagem é obrigatória.' });
+            res.status(422).json({ message: 'A imagem é obrigatória.' });
+            return; 
         }
 
         const token = await getToken(req);
@@ -58,16 +60,18 @@ module.exports = class PropertyController {
 
             const newProperty = await property.save();
 
-            return res.status(201).json({
+            res.status(201).json({
                 message: 'Imóvel cadastrado com sucesso.',
                 newProperty
             });
+            return;
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return;
         }
     }
 
@@ -75,12 +79,14 @@ module.exports = class PropertyController {
 
         try {
             const properties = await Property.find().sort('-createdAt');
-            return res.status(200).json({ properties: properties });
+            res.status(200).json({ properties: properties });
+            return; 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return;
         }
 
     }
@@ -93,13 +99,15 @@ module.exports = class PropertyController {
         try {
 
             const properties = await Property.find({ 'user._id': user._id }).sort('-createdAt');
-            return res.status(200).json({ properties: properties });
+            res.status(200).json({ properties: properties });
+            return; 
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return; 
         }
 
     }
@@ -112,13 +120,15 @@ module.exports = class PropertyController {
         try {
 
             const properties = await Property.find({ 'contractor._id': user._id }).sort('-createdAt');
-            return res.status(200).json({ properties: properties });
+            res.status(200).json({ properties: properties });
+            return; 
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return; 
         }
     }
 
@@ -128,19 +138,22 @@ module.exports = class PropertyController {
 
         const idExists = await Property.findById(id);
         if (!idExists) {
-            return res.status(422).json({ message: 'Imóvel não encontrado.' });
+            res.status(422).json({ message: 'Imóvel não encontrado.' });
+            return; 
         }
 
         try {
 
             const property = await Property.findById(id);
-            return res.status(200).json({ property: property });
+            res.status(200).json({ property: property });
+            return; 
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return; 
         }
     }
 
@@ -153,23 +166,27 @@ module.exports = class PropertyController {
 
         const idExists = await Property.findById(id);
         if (!idExists) {
-            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+            res.status(404).json({ message: 'Imóvel não encontrado.' });
+            return; 
         }
 
         if (idExists.user._id.toString() !== user._id.toString()) {
-            return res.status(422).json({ message: 'Este imóvel não é seu!' });
+            res.status(422).json({ message: 'Este imóvel não é seu!' });
+            return;
         }
 
         try {
 
             await Property.findByIdAndRemove(id);
-            return res.status(200).json({ message: 'Imóvel removido com sucesso!' });
+            res.status(200).json({ message: 'Imóvel removido com sucesso!' });
+            return; 
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return; 
         }
     }
 
@@ -196,16 +213,19 @@ module.exports = class PropertyController {
 
         const idExists = await Property.findOne({ _id: id });
         if (!idExists) {
-            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+            res.status(404).json({ message: 'Imóvel não encontrado.' });
+            return; 
         }
 
         if (idExists.user._id.toString() !== user._id.toString()) {
-            return res.status(422).json({ message: 'Este imóvel não é seu!' });
+            res.status(422).json({ message: 'Este imóvel não é seu!' });
+            return; 
         }
 
         for (const validation of validations) {
             if (!req.body[validation.field]) {
-                return res.status(422).json({ message: validation.message });
+                res.status(422).json({ message: validation.message });
+                return; 
             }
         }
 
@@ -216,7 +236,8 @@ module.exports = class PropertyController {
         updatedData.bedrooms = bedrooms;
 
         if (images.length === 0) {
-            return res.status(422).json({ message: 'A imagem é obrigatória.' });
+            res.status(422).json({ message: 'A imagem é obrigatória.' });
+            return; 
         } else {
             updatedData.images = [];
             images.map((image) => {
@@ -227,13 +248,15 @@ module.exports = class PropertyController {
         try {
 
             await Property.findByIdAndUpdate(id, updatedData);
-            return res.status(200).json({ message: 'Imóvel atualizado com sucesso!' });
+            res.status(200).json({ message: 'Imóvel atualizado com sucesso!' });
+            return; 
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return; 
         }
     }
 
@@ -243,18 +266,21 @@ module.exports = class PropertyController {
 
         const property = await Property.findOne({ _id: id });
         if (!property) {
-            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+            res.status(404).json({ message: 'Imóvel não encontrado.' });
+            return;
         }
 
         const token = await getToken(req);
         const user = await getUserByToken(token);
 
         if (property.user._id.toString() === user._id.toString()) {
-            return res.status(404).json({ message: 'Você não pode agendar uma visita para o seu próprio imóvel.' });
+            res.status(404).json({ message: 'Você não pode agendar uma visita para o seu próprio imóvel.' });
+            return;
         }
 
         if (property.contractor._id.toString() === user._id.toString()) {
-            return res.status(404).json({ message: 'Você já agendou uma visita a esse imóvel.' });
+            res.status(404).json({ message: 'Você já agendou uma visita a esse imóvel.' });
+            return;
         }
 
 
@@ -267,14 +293,16 @@ module.exports = class PropertyController {
             }
 
             await Property.findByIdAndUpdate(id, property);
-            return res.status(200).json({ message: `Visita agendada com sucesso entre em contato com o ${property.user.name}, pelo telefone ${property.user.phone}` });
+            res.status(200).json({ message: `Visita agendada com sucesso entre em contato com o ${property.user.name}, pelo telefone ${property.user.phone}` });
+            return;
 
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return;
         }
     }
 
@@ -284,14 +312,16 @@ module.exports = class PropertyController {
 
         const property = await Property.findOne({ _id: id });
         if (!property) {
-            return res.status(404).json({ message: 'Imóvel não encontrado.' });
+            res.status(404).json({ message: 'Imóvel não encontrado.' });
+            return;
         }
 
         const token = await getToken(req);
         const user = await getUserByToken(token);
 
         if (property.user._id.toString() !== user._id.toString()) {
-            return res.status(422).json({ message: 'Este imóvel não é seu!' });
+            res.status(422).json({ message: 'Este imóvel não é seu!' });
+            return;
         }
 
         property.available = false;
@@ -299,14 +329,16 @@ module.exports = class PropertyController {
         try {
 
             await Property.findByIdAndUpdate(id, property);
-            return res.status(200).json({ message: 'Parabéns! o processo de negociação foi finalizado com sucesso!' });
+            res.status(200).json({ message: 'Parabéns! o processo de negociação foi finalizado com sucesso!' });
+            return;
 
         } catch (error) {
 
             console.log(error);
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Ocorreu um erro na requisição, tente novamente mais tarde.'
             });
+            return;
 
         }
 
