@@ -191,12 +191,12 @@ module.exports = class UserController {
                 check: () => parseInt(age, 10) >= 18
             },
             { field: 'password', message: 'A senha é obrigatória' },
-            { field: 'confirmpassword', message: 'A confirmação de senha é obrigatória' },
+            { field: 'confirmpassword', message: 'A confirmação de senha é obrigatória' }
         ];
 
         const userExists = await User.findOne({ email: email });
 
-        if (user.email === email && userExists) {
+        if (user.email !== email && userExists) {
             res.status(422).json({ message: 'Utilize outro email!' });
             return;
         }
@@ -214,17 +214,23 @@ module.exports = class UserController {
         user.phone = phone;
         user.age = age;
 
-        const passwordHash = await encryptingPass(password);
-        user.password = passwordHash;
-
         if (confirmpassword !== password) {
             res.status(422).json({ message: 'As senhas não condizem' });
             return;
+
+        } else if (password === confirmpassword && password !== null) {
+            const passwordHash = await encryptingPass(password);
+            user.password = passwordHash
         }
 
         try {
 
-            await User.findByIdAndUpdate({ _id: user.id }, user);
+            await User.findOneAndUpdate(
+                { _id: user._id },
+                { $set: user },
+                { new: true }
+            )
+
             res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
             return;
 
