@@ -30,6 +30,11 @@ const Property = mongoose.model(
             required: true,
         },
 
+        title: {
+            type: String,
+            required: true,
+        },
+
         description: {
             type: String,
         },

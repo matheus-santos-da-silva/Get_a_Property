@@ -8,7 +8,7 @@ module.exports = class PropertyController {
 
     static async create(req, res) {
 
-        const { type, address, zipcode, price, bedrooms, description } = req.body;
+        const { type, address, zipcode, price, bedrooms, description, title } = req.body;
         const images = req.files;
 
         const validations = [
@@ -17,6 +17,7 @@ module.exports = class PropertyController {
             { field: 'zipcode', message: 'O cep é obrigatório' },
             { field: 'price', message: 'O preço é obrigatório' },
             { field: 'bedrooms', message: 'A quantidade de quartos do seu imóvel é obrigatória' },
+            { field: 'title', message: 'O título para o seu imóvel é obrigatório' }
         ];
 
         const available = true;
@@ -42,6 +43,7 @@ module.exports = class PropertyController {
             zipcode,
             price,
             bedrooms,
+            title,
             description,
             available,
             images: [],
@@ -193,7 +195,7 @@ module.exports = class PropertyController {
     static async editProperty(req, res) {
 
         const id = req.params.id;
-        const { type, address, zipcode, price, bedrooms, description } = req.body;
+        const { type, address, zipcode, price, bedrooms, description, title } = req.body;
         const images = req.files;
 
         const available = true;
@@ -204,6 +206,7 @@ module.exports = class PropertyController {
             { field: 'zipcode', message: 'O cep é obrigatório' },
             { field: 'price', message: 'O preço é obrigatório' },
             { field: 'bedrooms', message: 'A quantidade de quartos do seu imóvel é obrigatória' },
+            { field: 'title', message: 'O título para o seu imóvel é obrigatório' }
         ];
 
         const updatedData = {};
@@ -234,11 +237,11 @@ module.exports = class PropertyController {
         updatedData.zipcode = zipcode;
         updatedData.price = price;
         updatedData.bedrooms = bedrooms;
+        updatedData.title = title;
+        updatedData.description = description;
 
-        if (images.length === 0) {
-            res.status(422).json({ message: 'A imagem é obrigatória.' });
-            return; 
-        } else {
+
+        if (images.length > 0) {
             updatedData.images = [];
             images.map((image) => {
                 updatedData.images.push(image.filename);
