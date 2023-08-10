@@ -60,10 +60,19 @@ function PropertyForm({ handleSubmit, propertyData, btnText }) {
                 handleOnChange={onFileChange}
                 multiple={true}
             />
+            <Input
+                text='Título do imóvel'
+                type='text'
+                name='title'
+                placeholder='Título do imóvel (Ex: Casa na praia em...)'
+                handleOnChange={handleChange}
+                value={property.title || ''}
+            />
             <Select
                 name='type'
                 text='Selecione o tipo'
                 options={types}
+                placeholder='Digite o endereço do imóvel'
                 handleOnChange={handleType}
                 value={property.type || ''}
             />

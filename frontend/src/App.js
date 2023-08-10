@@ -14,6 +14,7 @@ import Home from './components/pages/Home'
 import Profile from './components/pages/User/Profile'
 import MyProperties from './components/pages/Property/MyProperties'
 import AddProperty from './components/pages/Property/AddProperty'
+import EditProperty from './components/pages/Property/EditProperty'
 
 /* context */
 import { UserProvider } from './context/UserContext'
@@ -32,6 +33,7 @@ function App() {
             <Route path='/user/profile' element={<Profile />} />
             <Route path='/property/myproperties' element={<MyProperties />} />
             <Route path='/property/add' element={<AddProperty />} />
+            <Route path='/property/edit/:id' element={<EditProperty />} />
             <Route path='/' element={<Home />} />
           </Routes>
         </Container>
