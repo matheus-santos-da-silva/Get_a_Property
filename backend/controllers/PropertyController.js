@@ -281,11 +281,13 @@ module.exports = class PropertyController {
             return;
         }
 
-        if (property.contractor._id.toString() === user._id.toString()) {
-            res.status(404).json({ message: 'Você já agendou uma visita a esse imóvel.' });
-            return;
-        }
 
+        if (property.contractor) {
+            if (property.contractor._id.toString() === user._id.toString()) {
+                res.status(404).json({ message: 'Você já agendou uma visita a esse imóvel.' });
+                return;
+            }
+        }
 
         try {
 
