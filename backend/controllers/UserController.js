@@ -189,9 +189,7 @@ module.exports = class UserController {
             {
                 field: 'age', message: 'A idade é obrigatória e deve ser maior que 18 anos',
                 check: () => parseInt(age, 10) >= 18
-            },
-            { field: 'password', message: 'A senha é obrigatória' },
-            { field: 'confirmpassword', message: 'A confirmação de senha é obrigatória' }
+            }
         ];
 
         const userExists = await User.findOne({ email: email });
@@ -218,7 +216,7 @@ module.exports = class UserController {
             res.status(422).json({ message: 'As senhas não condizem' });
             return;
 
-        } else if (password === confirmpassword && password !== null) {
+        } else if (password === confirmpassword && password !== undefined) {
             const passwordHash = await encryptingPass(password);
             user.password = passwordHash
         }

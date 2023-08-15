@@ -169,7 +169,7 @@ module.exports = class PropertyController {
         const idExists = await Property.findById(id);
         if (!idExists) {
             res.status(404).json({ message: 'Imóvel não encontrado.' });
-            return; 
+            return;  
         }
 
         if (idExists.user._id.toString() !== user._id.toString()) {
