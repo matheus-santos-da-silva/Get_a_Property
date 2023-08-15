@@ -3,6 +3,7 @@ import api from '../../../utils/api'
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import useFlashMessage from '../../../hooks/useFlashMessage'
+import formatCurrency from '../../../utils/currencyFormat'
 
 function PropertyDetails() {
 
@@ -53,7 +54,7 @@ function PropertyDetails() {
                     </div>
 
                     <div className={styles.property_details_price}>
-                        A PARTIR DE:<h2>R$ {property.price},00</h2>
+                        A PARTIR DE:<h2>{formatCurrency(property.price)}</h2>
                     </div>
 
                     <div className={styles.property_details_content}>

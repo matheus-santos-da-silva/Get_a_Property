@@ -45,13 +45,17 @@
 }
 
 .propertylist_row span {
-    min-width: 100px;
+    max-width: 160px;
 }
 
 .actions {
     margin-left: auto;
 }
 
+.actions span {
+    margin-left: 400px;
+    margin-bottom: 0.5em;
+}
 .actions a,
 .actions button {
     text-decoration: none;

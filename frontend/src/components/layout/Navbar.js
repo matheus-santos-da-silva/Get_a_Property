@@ -12,7 +12,7 @@ function Navbar() {
     return (
         <nav className={styles.navbar}>
             <div className={styles.navbar_logo}>
-                <img src={Logo} alt='Get a Property'></img>
+                <Link to='/'><img src={Logo} alt='Get a Property'></img></Link>
                 <h2>Get a Property</h2>
             </div>
             <ul>
@@ -21,6 +21,10 @@ function Navbar() {
                 </li>
                 {authenticated ? (
                     <>
+                        <li>
+                            <Link to='/property/mynegotiations'>Minhas negociações</Link>
+                        </li>
+
                         <li>
                             <Link to='/property/myproperties'>Meus imóveis</Link>
                         </li>

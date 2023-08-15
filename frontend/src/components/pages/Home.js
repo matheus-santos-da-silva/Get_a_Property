@@ -1,6 +1,7 @@
 import api from '../../utils/api'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import formatCurrency from '../../utils/currencyFormat'
 import styles from './Home.module.css'
 
 function Home() {
@@ -38,7 +39,7 @@ function Home() {
 
                                 <div >
                                     <p>
-                                        <span >Preço:</span> R$ {property.price} <br></br>
+                                        <span >Preço:</span> {formatCurrency(property.price)} <br></br>
                                     </p>
                                     <p className={styles.property_card_address}>
                                         <span>Endereço:</span> {property.address}

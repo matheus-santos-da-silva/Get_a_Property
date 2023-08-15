@@ -4,12 +4,14 @@ import RoundedImage from '../../layout/RoundedImage'
 import useFlashMessage from '../../../hooks/useFlashMessage'
 import api from '../../../utils/api'
 import styles from './Dashboard.module.css'
+import { useNavigate } from "react-router-dom"
 
 function MyProperties() {
 
     const [properties, setProperties] = useState([])
     const [token] = useState(localStorage.getItem('token' || ''))
     const { setFlashMessage } = useFlashMessage()
+    const navigate = useNavigate()
 
     useEffect(() => {
         api.get('/properties/myproperties', {
@@ -43,6 +45,24 @@ function MyProperties() {
         setFlashMessage(data.message, msgType)
     }
 
+    async function concludeNegotiation(id) {
+        let msgType = 'success'
+
+        const data = await api.patch(`/properties/conclude/${id}`, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(token)}`
+            }
+        }).then((response) => {
+            navigate('/')
+            return response.data
+        }).catch((error) => {
+            msgType = 'error'
+            return error.response.data
+        })
+
+        setFlashMessage(data.message, msgType)
+    }
+
     return (
         <section>
 
@@ -66,7 +86,9 @@ function MyProperties() {
                                     (<>
                                         {
                                             property.contractor && (
-                                                <button className={styles.conclude_btn}>Concluir adoção</button>
+                                                <button className={styles.conclude_btn} onClick={() => {
+                                                    concludeNegotiation(property._id)
+                                                }}>Concluir adoção</button>
                                             )
                                         }
                                         <Link to={`/property/edit/${property._id}`} >Editar</Link>
