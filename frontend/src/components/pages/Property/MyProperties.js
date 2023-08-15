@@ -88,7 +88,7 @@ function MyProperties() {
                                             property.contractor && (
                                                 <button className={styles.conclude_btn} onClick={() => {
                                                     concludeNegotiation(property._id)
-                                                }}>Concluir adoção</button>
+                                                }}>Concluir negociação</button>
                                             )
                                         }
                                         <Link to={`/property/edit/${property._id}`} >Editar</Link>
